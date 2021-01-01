@@ -9,7 +9,7 @@ const Search = React.memo((props) => {
   const filterRef = useRef()
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (filter === filterRef.current.value) {
         const query =
           filter.length === 0 ? '' : `?orderBy="title"&equalTo="${filter}"`
@@ -31,6 +31,10 @@ const Search = React.memo((props) => {
           })
       }
     }, 500)
+    return () => {
+      clearTimeout(timer)
+    }
+    // if you have [] as dependencies, the cleanup function runs when the component gets unmounted
   }, [filter, onLoadIngredients, filterRef])
   // useEffect gets executed after every render cycle
 
