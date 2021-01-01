@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import Card from '../UI/Card'
 import './Search.css'
@@ -6,26 +6,33 @@ import './Search.css'
 const Search = React.memo((props) => {
   const { onLoadIngredients } = props
   const [filter, setFilter] = useState('')
+  const filterRef = useRef()
 
   useEffect(() => {
-    const query = filter.length === 0 ? '' : `?orderBy="title"&equalTo="${filter}"`
-    fetch(
-      'https://react-hooks-tutorial-hehe-default-rtdb.firebaseio.com/ingredients.json' + query
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        const loadedIngredients = []
-        for (const key in data) {
-          loadedIngredients.push({
-            id: key,
-            title: data[key].title,
-            amount: data[key].amount,
+    setTimeout(() => {
+      if (filter === filterRef.current.value) {
+        const query =
+          filter.length === 0 ? '' : `?orderBy="title"&equalTo="${filter}"`
+        fetch(
+          'https://react-hooks-tutorial-hehe-default-rtdb.firebaseio.com/ingredients.json' +
+            query
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            const loadedIngredients = []
+            for (const key in data) {
+              loadedIngredients.push({
+                id: key,
+                title: data[key].title,
+                amount: data[key].amount,
+              })
+            }
+            onLoadIngredients(loadedIngredients)
           })
-        }
-        onLoadIngredients(loadedIngredients)
-      })
-  }, [filter, onLoadIngredients])
-    // useEffect gets executed after every render cycle
+      }
+    }, 500)
+  }, [filter, onLoadIngredients, filterRef])
+  // useEffect gets executed after every render cycle
 
   return (
     <section className="search">
@@ -33,6 +40,7 @@ const Search = React.memo((props) => {
         <div className="search-input">
           <label>Filter by Title</label>
           <input
+            ref={filterRef}
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
