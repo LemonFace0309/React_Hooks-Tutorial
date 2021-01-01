@@ -26,14 +26,24 @@ const Ingredients = () => {
   }
 
   const onRemoveIngredientHandler = (id) => {
-    setIngredients((prevIngredients) => {
-      return prevIngredients.filter((ig) => id !== ig.id)
-    })
+    fetch(
+      `https://react-hooks-tutorial-hehe-default-rtdb.firebaseio.com/ingredients${id}.json`,
+      {
+        method: 'DELETE',
+      }.then((res) => {
+        setIngredients((prevIngredients) => {
+          return prevIngredients.filter((ig) => id !== ig.id)
+        })
+      })
+    )
   }
 
-  const filterIngredientsHandler = useCallback(filteredIngredients => {
-    setIngredients(filteredIngredients) 
-  }, [setIngredients /* never re-runs */])
+  const filterIngredientsHandler = useCallback(
+    (filteredIngredients) => {
+      setIngredients(filteredIngredients)
+    },
+    [setIngredients /* never re-runs */]
+  )
   // useCallback caches filterIngredientsHandler so it change after rerender cycles.
   // This is important because otherwise, useEffect in Search.js would be in an infinite loop
 
