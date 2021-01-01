@@ -27,15 +27,15 @@ const Ingredients = () => {
 
   const onRemoveIngredientHandler = (id) => {
     fetch(
-      `https://react-hooks-tutorial-hehe-default-rtdb.firebaseio.com/ingredients${id}.json`,
+      `https://react-hooks-tutorial-hehe-default-rtdb.firebaseio.com/ingredients/${id}.json`,
       {
         method: 'DELETE',
-      }.then((res) => {
-        setIngredients((prevIngredients) => {
-          return prevIngredients.filter((ig) => id !== ig.id)
-        })
+      }
+    ).then((res) => {
+      setIngredients((prevIngredients) => {
+        return prevIngredients.filter((ig) => id !== ig.id)
       })
-    )
+    })
   }
 
   const filterIngredientsHandler = useCallback(
