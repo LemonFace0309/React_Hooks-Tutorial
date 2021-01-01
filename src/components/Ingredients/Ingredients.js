@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import IngredientForm from './IngredientForm'
 import IngredientList from './IngredientList'
@@ -8,10 +8,21 @@ const Ingredients = () => {
   const [ingredients, setIngredients] = useState([])
 
   const addIngredientHandler = (ingredient) => {
-    setIngredients((prevIngredients) => [
-      ...prevIngredients,
-      { id: Math.random().toString(), ...ingredient },
-    ])
+    fetch(
+      'https://react-hooks-tutorial-hehe-default-rtdb.firebaseio.com/ingredients.json',
+      {
+        method: 'POST',
+        body: JSON.stringify(ingredient),
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setIngredients((prevIngredients) => [
+          ...prevIngredients,
+          { id: data.name, ...ingredient },
+        ])
+      })
   }
 
   const onRemoveIngredientHandler = (id) => {
@@ -20,12 +31,18 @@ const Ingredients = () => {
     })
   }
 
+  const filterIngredientsHandler = useCallback(filteredIngredients => {
+    setIngredients(filteredIngredients) 
+  }, [setIngredients /* never re-runs */])
+  // useCallback caches filterIngredientsHandler so it change after rerender cycles.
+  // This is important because otherwise, useEffect in Search.js would be in an infinite loop
+
   return (
     <div className="App">
       <IngredientForm onAddIngredient={addIngredientHandler} />
 
       <section>
-        <Search />
+        <Search onLoadIngredients={filterIngredientsHandler} />
         <IngredientList
           ingredients={ingredients}
           onRemoveItem={onRemoveIngredientHandler}
